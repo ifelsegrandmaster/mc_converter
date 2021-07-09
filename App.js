@@ -1,9 +1,7 @@
-import React, {useEffect} from "react";
+import React, { useEffect } from "react";
 
 import { Provider as StoreProvider } from "react-redux";
 import store from "./store";
-import {useDispatch} from "react-redux";
-import {fetchCodes} from "./appSlice";
 
 import "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";

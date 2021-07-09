@@ -1,10 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 
 export const calculatorSlice = createSlice({
     name: 'calculator',
     initialState: {
         currencies: [],
-        currenciesByCode: {},
+        conversionRatesByCode: {},
         mainCurrency: null,
         loading: false,
         amount: 0,
@@ -17,8 +18,8 @@ export const calculatorSlice = createSlice({
         },
         fetchCurrencySuccess: (state, action) => {
             const code = action.payload.code;
-            const data = action.payload.data;
-            state.currenciesByCode[code] = data;
+            const conversionRates = action.payload.conversionRates;
+            state.conversionRatesByCode[code] = conversionRates;
             state.loading = false
         },
         fetchCurrencyBegin: (state) => {
@@ -37,7 +38,7 @@ export const calculatorSlice = createSlice({
             state.mainCurrency = action.payload;
         },
         setAmount: (state, action) => {
-            state.amount = amount.payload;
+            state.amount = action.payload;
         }
     }
 });
@@ -52,14 +53,17 @@ export const {
     setAmount,
 } = calculatorSlice.actions;
 
+
 export const fetchCurrency = (baseUrl, currencyCode) => dispatch => {
-    dispatch(fetchCodesBegin)
-    const url = `${baseUrl}/${currencyCode}`;
-    axios.get(url).then(response => {
-        currencies = response.data.supported_codes;
-        dispatch(fetchCurrencySuccess(currencies));
+    dispatch(fetchCurrencyBegin())
+    axios.get(`${baseUrl}/${currencyCode}`).then(response => {
+        const code = response.data.base_code;
+        const conversionRates = response.data.conversion_rates;
+        dispatch(fetchCurrencySuccess({ code, conversionRates }));
     }).catch(error => {
-        dispatch(fetchCurrencyFailure(error))
+        const data = error.response.data;
+        const status = error.response.status;
+        dispatch(fetchCurrencyFailure({ status, data }))
     })
 }
 

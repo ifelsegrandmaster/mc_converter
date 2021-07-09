@@ -26,12 +26,15 @@ export const appSlice = createSlice({
 export const { fetchCodesSuccess, fetchCodesBegin, fetchCodesFailure } = appSlice.actions;
 
 export const fetchCodes = url => dispatch => {
-    dispatch(fetchCodesBegin)
+    dispatch(fetchCodesBegin())
     axios.get(url).then(response => {
         currencies = response.data.supported_codes;
         dispatch(fetchCodesSuccess(currencies));
     }).catch(error => {
-        dispatch(fetchCodesError(error))
+        const data = error.response.data;
+        const status = error.response.status;
+        dispatch(fetchCodesFailure({ status, data }))
     })
 }
+
 export default appSlice.reducer;

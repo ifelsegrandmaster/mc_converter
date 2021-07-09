@@ -1,48 +1,29 @@
-import React,{Component} from "react";
-import {StyleSheet, Text, View, AppRegistry} from "react-native";
-import {List} from "react-native-paper";
+import React, { useEffect } from "react";
+import {useDispatch, useSelector} from "react-redux";
+import { StyleSheet, View} from "react-native";
+import {MMKV} from "react-native-mmkv";
+import { List } from "react-native-paper";
 
-class ExchangeRateHistory extends Component {
-    render(){
-        return (
-            <View>
-                <List.Item
-                 style={styles.listItem}
-                 title="Monday"
-                />
-                <List.Item
-                 title="Tuesday"
-                 style={styles.listItem}
-                />
-                <List.Item
-                 title="Wednesday"
-                 style={styles.listItem}
-                />
-                <List.Item
-                 title="Thursday"
-                 style={styles.listItem}
-                />
-                <List.Item
-                 title="Friday"
-                 style={styles.listItem}
-                />
-                <List.Item
-                 title="Saturday"
-                 style={styles.listItem}
-                />
-                <List.Item
-                 title="Sunday"
-                 style={styles.listItem}
-                />
-            </View>
-        )
-    }
+export default function (props) {
+    const dispatch = useDispatch();
+    const history = useSelector((state) => state.exchangeratehistory.history);
+    useEffect(() => {
+        // fetch history but first check if history already exists in the
+        // AsyncStorage
+
+    }, [null])
+    return (
+        <View>
+            <List.Item
+                style={styles.listItem}
+                title="Monday"
+            />
+        </View>
+    )
 }
 
-export default ExchangeRateHistory;
-
 const styles = StyleSheet.create({
-    listItem:{
+    listItem: {
         padding: 10,
         borderBottomWidth: 1,
         borderBottomColor: "#dddddd",

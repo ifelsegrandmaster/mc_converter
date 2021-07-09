@@ -8,13 +8,24 @@ import CurrencyWidget from "./CurrencyWidget";
 export default function Calculator() {
     const dispatch = useDispatch();
     const currencies = useSelector((state) => state.app.currencies);
-    const selectedCurrencies = useSelector((state) => state.calculator.currencies);
-    function calculate(code, amount) {
+    const currenciesToBeConverted = useSelector((state) => state.calculator.currencies);
+    // Main currency
+    const mainCurrency = useSelector((state) => state.calculator.mainCurrency);
+    // select rate to work with
+    const currentRate = useSelector((state) => state.calculator.conversionRatesByCode[mainCurrency]);
+    const amount = useSelector((state) => state.calculator.amount);
+
+    const currenciesWidgets = currenciesToBeConverted.map(currency =>
+    {
+        // get the conversion rate
+        const code = currency[0];
+        const conversionRate = (currentRate !== undefined) ? currentRate[code]: 0;
+        const convertedAmount = amount * conversionRate;
+
+        return (
+            <CurrencyWidget key={currency[0]} code={currency[0]} amount={convertedAmount} name={currency[1]} />
+        )
     }
-    const currenciesWidgets = selectedCurrencies.map(currency =>
-    (
-        <CurrencyWidget key={currency[0]} code={currency[0]} name={currency[1]} />
-    )
     )
     const [dialogIsVisible, setDialogIsVisible] = useState(false);
     useEffect(() => {
