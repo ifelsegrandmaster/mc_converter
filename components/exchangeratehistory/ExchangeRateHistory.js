@@ -1,31 +1,40 @@
-import React, { useEffect } from "react";
-import {useDispatch, useSelector} from "react-redux";
-import { StyleSheet, View} from "react-native";
-import {MMKV} from "react-native-mmkv";
-import { List } from "react-native-paper";
+import React from "react";
+import { useSelector } from "react-redux";
+import { StyleSheet, ScrollView } from "react-native";
+import { List, Text } from "react-native-paper";
 
-export default function (props) {
-    const dispatch = useDispatch();
-    const history = useSelector((state) => state.exchangeratehistory.history);
-    useEffect(() => {
-        // fetch history but first check if history already exists in the
-        // AsyncStorage
+// Component
+export default function ExchangeRateHistory(props) {
+    const history = useSelector((state) => state.app.history);
+    // Get the keys for all entries in history
+    const historyKeys = Object.keys(history);
+    // History is added in ascending order
+    // with the most recent at the bottom. It has to be reversed
+    historyKeys.reverse();
+    const content = (historyKeys.length > 0) ? historyKeys.map(entry => {
+        return (<List.Item
+            key={entry}
+            title={entry}
+            style={styles.listItem}
+        />);
+    }) : <Text style={styles.textCenter}>No history yet</Text>;
 
-    }, [null])
     return (
-        <View>
-            <List.Item
-                style={styles.listItem}
-                title="Monday"
-            />
-        </View>
+        <ScrollView>
+            {content}
+        </ScrollView>
     )
 }
 
+// Styles
 const styles = StyleSheet.create({
     listItem: {
         padding: 10,
         borderBottomWidth: 1,
         borderBottomColor: "#dddddd",
+    },
+    textCenter: {
+        textAlign: 'center',
+        width: '100%'
     }
 })

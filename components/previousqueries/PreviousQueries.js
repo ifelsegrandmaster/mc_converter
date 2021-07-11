@@ -1,42 +1,33 @@
-import React,{Component} from "react";
-import {StyleSheet,View} from "react-native";
-import {List} from "react-native-paper";
+import React from "react";
+import { useSelector } from "react-redux";
 
+import { StyleSheet, ScrollView } from "react-native";
+import { List } from "react-native-paper";
 
-
-class PreviousQueries extends Component {
-    render(){
-        return (
-            <View>
-                <List.Item
-                 style={styles.listItem}
-                 title="Today @ 12:23"
-                 description="USD, Rand, Kwacha"
-                />
-                <List.Item
-                 title="Today @ 07:23"
-                 style={styles.listItem}
-                 description="USD, Pound, INR"
-                />
-                <List.Item
-                 title="Yesterday @ 14:45"
-                 description="Yen, Pound, INR"
-                 style={styles.listItem}
-                />
-                <List.Item
-                 title="06/07/2021 @ 23:12"
-                 description="USD, ZWL, Kwacha"
-                 style={styles.listItem}
-                />
-            </View>
-        )
-    }
+// Component
+export default function PreviousQueries(props) {
+    const queries = useSelector((state) => state.calculator.queries);
+    // the queries are added in ascending order
+    // with the most recent at the bottom
+    // so they have to be reversed
+    const items = queries.slice(0).reverse().map((query, index) =>
+    (<List.Item
+        key={index}
+        title={query.code}
+        description={query.timestamp}
+        style={styles.listItem}
+    />)
+    )
+    return (
+        <ScrollView>
+            {items}
+        </ScrollView>
+    )
 }
 
-export default PreviousQueries;
-
+// Styles
 const styles = StyleSheet.create({
-    listItem:{
+    listItem: {
         padding: 10,
         borderBottomWidth: 1,
         borderBottomColor: "#dddddd",

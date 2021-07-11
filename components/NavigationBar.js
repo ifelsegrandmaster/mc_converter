@@ -1,14 +1,15 @@
 import { Appbar, Menu } from "react-native-paper";
-import React from "react";
+import React, {useState} from "react";
 
-function NavigationBar({ navigation, previous }) {
-    const [visible, setVisible] = React.useState(false);
+function NavigationBar({ navigation, previous, scene }) {
+    const title = scene.descriptor.options.title;
+    const [visible, setVisible] = useState(false);
     const openMenu = () => setVisible(true);
     const closeMenu = () => setVisible(false);
     return (
         <Appbar.Header>
             {previous ? <Appbar.BackAction onPress={navigation.goBack} /> : null}
-            <Appbar.Content title="Multi-currency converter" />
+            <Appbar.Content title={title} />
             <Menu
                 visible={visible}
                 onDismiss={closeMenu}
@@ -17,13 +18,23 @@ function NavigationBar({ navigation, previous }) {
                 }
             >
                 <Menu.Item
-                    onPress={() => navigation.navigate("Calculator")}
-                    title="Calculate" />
+                    onPress={() => {
+                        navigation.navigate("Calculator");
+                        closeMenu();
+                    }}
+                    title="Convert" />
                 <Menu.Item
-                    onPress={() => navigation.navigate("PreviousQueries")}
+                    onPress={() => {
+                        navigation.navigate("PreviousQueries");
+                        closeMenu();
+                    }
+                    }
                     title="Previous Queries" />
                 <Menu.Item
-                    onPress={() => navigation.navigate("ExchangeRateHistory")}
+                    onPress={() => {
+                        navigation.navigate("ExchangeRateHistory")
+                        closeMenu();
+                }}
                     title="Exchange Rate History" />
             </Menu>
         </Appbar.Header>

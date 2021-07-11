@@ -1,44 +1,35 @@
 import { createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import { AsyncStorage } from "react-native";
+import { historyOperationFailure } from "../../appSlice";
 
 export const calculatorSlice = createSlice({
     name: 'calculator',
     initialState: {
-        currencies: [],
-        conversionRatesByCode: {},
+        currenciesToBeConverted: [],
         mainCurrency: null,
         loading: false,
         amount: 0,
+        queries: [],
         error: null,
     },
     reducers: {
         addCurrency: (state, action) => {
             // Check if the currency has already been added
-            state.currencies.push(action.payload);
-        },
-        fetchCurrencySuccess: (state, action) => {
-            const code = action.payload.code;
-            const conversionRates = action.payload.conversionRates;
-            state.conversionRatesByCode[code] = conversionRates;
-            state.loading = false
-        },
-        fetchCurrencyBegin: (state) => {
-            state.loading = true;
-        },
-        fetchCurrencyFailure: (state, action) => {
-            state.loading = false;
-            state.error = action.payload;
+            state.currenciesToBeConverted.push(action.payload);
         },
         removeCurrency: (state, action) => {
-            const currencies = state.currencies;
-            const newCurrencies = currencies.filter(currency => currency[0] !== action.payload);
-            state.currencies = newCurrencies;
+            const currenciesToBeConverted = state.currenciesToBeConverted;
+            const newCurrencies = currenciesToBeConverted.filter(currency => currency[0] !== action.payload);
+            state.currenciesToBeConverted = newCurrencies;
         },
         setMainCurrency: (state, action) => {
             state.mainCurrency = action.payload;
         },
         setAmount: (state, action) => {
             state.amount = action.payload;
+        },
+        setQueries: (state, action) => {
+            state.queries = action.payload;
         }
     }
 });
@@ -51,20 +42,51 @@ export const {
     fetchCurrencyFailure,
     setMainCurrency,
     setAmount,
+    setQueries,
 } = calculatorSlice.actions;
 
+// Initialize queries
+export const initQueries = async(dispatch, getState) => {
+    let queries = null;
+    try {
+        queries = await AsyncStorage.getItem('queries');
+    } catch (error) {
+        const name = error.name;
+        const message = error.message;
+        dispatch(historyOperationFailure({ name, message }));
+        return;
+    }
 
-export const fetchCurrency = (baseUrl, currencyCode) => dispatch => {
-    dispatch(fetchCurrencyBegin())
-    axios.get(`${baseUrl}/${currencyCode}`).then(response => {
-        const code = response.data.base_code;
-        const conversionRates = response.data.conversion_rates;
-        dispatch(fetchCurrencySuccess({ code, conversionRates }));
-    }).catch(error => {
-        const data = error.response.data;
-        const status = error.response.status;
-        dispatch(fetchCurrencyFailure({ status, data }))
-    })
+    if (queries !== null) {
+        dispatch(setQueries(JSON.parse(queries)));
+    }
 }
 
+export const saveQuery = query => async(dispatch) => {
+    // get the previous queries
+    let queries = null;
+    try {
+        queries = await AsyncStorage.getItem('queries');
+    } catch (error) {
+        const name = error.name;
+        const message = error.message;
+        dispatch(historyOperationFailure({ name, message }));
+        return;
+    }
+
+    const newQueries = JSON.parse(queries) || [];
+    newQueries.push(query);
+
+    // save to storage
+    try {
+        await AsyncStorage.setItem('queries', JSON.stringify(newQueries));
+    } catch (error) {
+        const name = error.name;
+        const message = error.message;
+        dispatch(historyOperationFailure({ name, message }));
+    }
+
+    // update state
+    dispatch(setQueries(newQueries));
+}
 export default calculatorSlice.reducer;
