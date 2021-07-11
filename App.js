@@ -11,11 +11,12 @@ import { Provider as PaperProvider } from "react-native-paper";
 import ExchangeRateHistory from "./components/exchangeratehistory/ExchangeRateHistory";
 import Calculator from "./components/calculator/Calculator";
 import PreviousQueries from "./components/previousqueries/PreviousQueries";
+import DisplayQueryData from "./components/previousqueries/DisplayQueryData";
 import NavigationBar from "./components/NavigationBar";
+import Logging from "./components/logging/Logging";
 
-
+import {AsyncStorage} from "react-native";
 const Stack = createStackNavigator();
-
 // Component
 export default function App() {
   return (
@@ -41,6 +42,16 @@ export default function App() {
               name="PreviousQueries"
               component={PreviousQueries}
               options={{ title: "Previous Queries" }}
+            />
+            <Stack.Screen
+              name="DisplayQueryData"
+              component={DisplayQueryData}
+              options={{ title: "Display Query Data" }}
+            />
+            <Stack.Screen
+              name="Logging"
+              component={Logging}
+              options={{ title: "Error logs" }}
             />
           </Stack.Navigator>
         </NavigationContainer>

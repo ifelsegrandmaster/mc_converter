@@ -3,30 +3,37 @@ import axios from "axios";
 import getCurrenciesRates from "./utils";
 import { AsyncStorage } from "react-native";
 import { API_KEY } from "@env";
+
 export const appSlice = createSlice({
     name: 'app',
     initialState: {
         currencies: [],
-        currenciesRates: {},
-        loading: false,
+        currenciesRates: null,
+        currenciesRatesReady: false,
         loadingCurrenciesRates: false,
+        loadingCurrencies: false,
         history: {},
         errors: []
     },
     reducers: {
         fetchCurrenciesSuccess: (state, action) => {
             state.currencies = action.payload;
-            state.loading = false;
+            state.loadingCurrencies = false;
         },
         fetchCurrenciesBegin: (state) => {
-            state.loading = true;
+            state.loadingCurrencies = true;
         },
         fetchCurrenciesFailure: (state, action) => {
             state.errors.push(action.payload);
-            state.loading = false;
+            state.loadingCurrencies = false;
+        },
+        setCurrenciesRates: (state, action) => {
+            state.currenciesRates = action.payload;
+            state.currenciesRatesReady = true;
         },
         fetchCurrenciesRatesSuccess: (state, action) => {
             state.currenciesRates = action.payload;
+            state.currenciesRatesReady = true;
             state.loadingCurrenciesRates = false;
         },
         fetchCurrenciesRatesBegin: (state) => {
@@ -56,16 +63,17 @@ export const {
     fetchCurrenciesRatesFailure,
     setHistory,
     historyOperationFailure,
+    setCurrenciesRates,
 } = appSlice.actions;
 
-export const initHistory = async(dispatch, getState) => {
+export const initHistory = async(dispatch) => {
     let history = null;
     try {
         history = await AsyncStorage.getItem('history');
     } catch (error) {
-        const name = error.name;
+        const detail = "Could not get history from local storage";
         const message = error.message;
-        dispatch(historyOperationFailure({ name, message }));
+        dispatch(historyOperationFailure({ detail, message }));
         return;
     }
 
@@ -74,24 +82,28 @@ export const initHistory = async(dispatch, getState) => {
     }
 }
 
+
+
 export const updateHistory = data => async(dispatch) => {
-    // check if history exists
-    // if not, then create new
-    // else update old history
     let history = null;
+    console.log(data);
     try {
         history = await AsyncStorage.getItem('history');
     } catch (error) {
-        const name = error.name;
+        const detail = "Could not get history from local storage";
         const message = error.message;
-        dispatch(historyOperationFailure({ name, message }));
+        console.log(message);
+        dispatch(historyOperationFailure({ detail, message }));
+        return;
     }
 
     const now = new Date();
     const newKey = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`;
-    // add new data
+    // use old history if not null else create new history
     const newHistory = JSON.parse(history) || {};
+    // add new data
     newHistory[newKey] = data;
+
 
     // delete old history
     const keys = Object.keys(newHistory);
@@ -102,36 +114,64 @@ export const updateHistory = data => async(dispatch) => {
         }
     }
 
+    // save the history
     try {
-        await AsyncStorage.setItem('history', JSON.parse(newHistory));
+        await AsyncStorage.setItem('history', JSON.stringify(newHistory));
     } catch (error) {
-        const name = error.name;
+        const detail = "Could not save history to local storage.";
         const message = error.message;
-        dispatch(historyOperationFailure({ name, message }));
+        dispatch(historyOperationFailure({ detail, message }));
         return;
     }
-
-    setHistory(newHistory);
+    dispatch(setHistory(newHistory));
 }
 
 // Fetch currencies rates
 export const fetchCurrenciesRates = (currencies) => async(dispatch) => {
-        dispatch(fetchCurrenciesRatesBegin());
+    dispatch(fetchCurrenciesRatesBegin());
 
-        let data = null;
+    let data = null;
 
+    try {
+        data = await getCurrenciesRates(currencies);
+    } catch (error) {
+        const detail = "Could not fetch currencies rates.";
+        const message = error.message;
+        dispatch(fetchCurrenciesRatesFailure({ detail, message }));
+        return;
+    }
+
+    if (data !== null) {
+        dispatch(fetchCurrenciesRatesSuccess(data));
+        // save to history
+        dispatch(updateHistory(data));
+    }
+};
+
+export const saveCurrencies = (currencies) => async(dispatch) => {
+    try {
+        await AsyncStorage.setItem('currencies', JSON.stringify(currencies));
+    } catch (error) {
+        const detail = "Could not save currencies to local storage.";
+        const message = error.message;
+        dispatch(historyOperationFailure({ detail, message }));
+    }
+}
+
+// Load currencies from cache, for example if network error occurs
+export const loadCurrenciesFromCache = async(dispatch) => {
+        let currencies = null;
         try {
-            data = await getCurrenciesRates(currencies);
+            currencies = await AsyncStorage.getItem('currencies');
         } catch (error) {
-            const name = error.name;
+            const detail = "Could not load currencies from storage.";
             const message = error.message;
-            dispatch(fetchCurrenciesRatesFailure({ name, message }));
+            dispatch(historyOperationFailure({ detail, message }));
             return;
         }
 
-        if (data !== null) {
-            dispatch(fetchCurrenciesRatesSuccess(data));
-            dispatch(updateHistory(data));
+        if (currencies !== null) {
+            dispatch(fetchCurrenciesSuccess(JSON.parse(currencies)));
         }
     }
     // Fetch currencies
@@ -144,16 +184,21 @@ export const fetchCurrencies = async(dispatch) => {
         const response = await axios.get(url);
         currencies = response.data.supported_codes;
     } catch (error) {
-        const name = error.name;
+        const detail = "Could not load currencies from remote server.";
         const message = error.message;
-        dispatch(fetchCurrenciesFailure({ name, message }));
+        dispatch(fetchCurrenciesFailure({ detail, message }));
+        dispatch(loadCurrenciesFromCache);
         return;
     }
 
     if (currencies !== null) {
         dispatch(fetchCurrenciesSuccess(currencies));
+        // cache this data
+        dispatch(saveCurrencies(currencies))
+            // fetch currencies rates
         dispatch(fetchCurrenciesRates(currencies));
     }
+
 }
 
 export default appSlice.reducer;

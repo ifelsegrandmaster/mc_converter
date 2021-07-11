@@ -22,11 +22,12 @@ export default function CurrencyWidget({ code, name, amount }) {
         let amount = parseFloat(txt);
         if (!isNaN(amount)) {
             dispatch(setAmount(amount));
-            dispatch(setMainCurrency(code));
+            dispatch(setMainCurrency({name, code}));
             setError("");
         }
         else {
             setError("Enter a valid number");
+            dispatch(setMainCurrency(null));
         }
     }
 

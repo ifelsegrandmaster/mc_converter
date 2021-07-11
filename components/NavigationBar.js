@@ -36,6 +36,12 @@ function NavigationBar({ navigation, previous, scene }) {
                         closeMenu();
                 }}
                     title="Exchange Rate History" />
+                <Menu.Item
+                    onPress={() => {
+                        navigation.navigate("Logging")
+                        closeMenu();
+                }}
+                    title="Error logs" />
             </Menu>
         </Appbar.Header>
     )

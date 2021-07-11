@@ -2,19 +2,18 @@ import { createSlice } from "@reduxjs/toolkit";
 import { AsyncStorage } from "react-native";
 import { historyOperationFailure } from "../../appSlice";
 
+
 export const calculatorSlice = createSlice({
     name: 'calculator',
     initialState: {
         currenciesToBeConverted: [],
         mainCurrency: null,
-        loading: false,
         amount: 0,
         queries: [],
-        error: null,
+        selectedQuery: null,
     },
     reducers: {
         addCurrency: (state, action) => {
-            // Check if the currency has already been added
             state.currenciesToBeConverted.push(action.payload);
         },
         removeCurrency: (state, action) => {
@@ -30,7 +29,10 @@ export const calculatorSlice = createSlice({
         },
         setQueries: (state, action) => {
             state.queries = action.payload;
-        }
+        },
+        setQueryToDisplay: (state, action) => {
+            state.selectedQuery = action.payload;
+        },
     }
 });
 
@@ -43,17 +45,18 @@ export const {
     setMainCurrency,
     setAmount,
     setQueries,
+    setQueryToDisplay,
 } = calculatorSlice.actions;
 
 // Initialize queries
-export const initQueries = async(dispatch, getState) => {
+export const initQueries = async(dispatch) => {
     let queries = null;
     try {
         queries = await AsyncStorage.getItem('queries');
     } catch (error) {
-        const name = error.name;
+        const detail = "Could not load queries from local storage";
         const message = error.message;
-        dispatch(historyOperationFailure({ name, message }));
+        dispatch(historyOperationFailure({ detail, message }));
         return;
     }
 
@@ -68,9 +71,9 @@ export const saveQuery = query => async(dispatch) => {
     try {
         queries = await AsyncStorage.getItem('queries');
     } catch (error) {
-        const name = error.name;
+        const detail = "Could not get queries from local storage.";
         const message = error.message;
-        dispatch(historyOperationFailure({ name, message }));
+        dispatch(historyOperationFailure({ detail, message }));
         return;
     }
 
@@ -81,9 +84,9 @@ export const saveQuery = query => async(dispatch) => {
     try {
         await AsyncStorage.setItem('queries', JSON.stringify(newQueries));
     } catch (error) {
-        const name = error.name;
+        const detail = "Could not save query to local storage.";
         const message = error.message;
-        dispatch(historyOperationFailure({ name, message }));
+        dispatch(historyOperationFailure({ detail, message }));
     }
 
     // update state

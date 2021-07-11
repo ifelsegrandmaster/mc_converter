@@ -12,9 +12,12 @@ export default function ExchangeRateHistory(props) {
     // with the most recent at the bottom. It has to be reversed
     historyKeys.reverse();
     const content = (historyKeys.length > 0) ? historyKeys.map(entry => {
+        const date = new Date(entry);
+        const title = date.toDateString();
+
         return (<List.Item
             key={entry}
-            title={entry}
+            title={title}
             style={styles.listItem}
         />);
     }) : <Text style={styles.textCenter}>No history yet</Text>;

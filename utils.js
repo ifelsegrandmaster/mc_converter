@@ -1,6 +1,5 @@
 import axios from "axios";
 import { API_KEY } from "@env";
-console.log(API_KEY, "in why does this always happen");
 
 // fetch currency data
 export async function fetchCurrencyData(code) {
