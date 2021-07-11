@@ -24,7 +24,7 @@ export default function Calculator() {
 
     let currenciesStatus = "";
     if (!loadingCurrencies && !currenciesReady) {
-        currenciesStatus = "Could not retrieve currencies";
+        currenciesStatus = "Could not retrieve currencies. Check error logs.";
     }
 
     const currenciesRatesReady = useSelector((state) => state.app.currenciesRatesReady);
@@ -32,7 +32,7 @@ export default function Calculator() {
 
     let currenciesRatesStatus = "";
     if (!loadingCurrenciesRates && !currenciesRatesReady) {
-        currenciesRatesStatus = "Could not retrieve currencies rates";
+        currenciesRatesStatus = "Could not retrieve currencies rates. Check error logs.";
     }
 
     const currenciesToBeConverted = useSelector((state) => state.calculator.currenciesToBeConverted);

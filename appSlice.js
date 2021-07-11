@@ -8,10 +8,11 @@ export const appSlice = createSlice({
     name: 'app',
     initialState: {
         currencies: [],
+        currenciesReady: false,
+        loadingCurrencies: false,
         currenciesRates: null,
         currenciesRatesReady: false,
         loadingCurrenciesRates: false,
-        loadingCurrencies: false,
         history: {},
         errors: []
     },
@@ -19,6 +20,7 @@ export const appSlice = createSlice({
         fetchCurrenciesSuccess: (state, action) => {
             state.currencies = action.payload;
             state.loadingCurrencies = false;
+            state.currenciesReady = true;
         },
         fetchCurrenciesBegin: (state) => {
             state.loadingCurrencies = true;

@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import {setQueryToDisplay} from "../calculator/calculatorSlice";
 
 import { StyleSheet, ScrollView } from "react-native";
-import { List, Portal, Dialog, DataTable, Button, Paragraph } from "react-native-paper";
+import { List } from "react-native-paper";
 
 
 
@@ -20,9 +20,6 @@ export default function PreviousQueries({navigation}) {
     // the queries are added in ascending order
     // with the most recent at the bottom
     // so they have to be reversed
-    for(const q of queries){
-        console.log(q);
-    }
     const queryListItems = queries.slice(0).reverse().map((query, index) =>
     (
         <List.Item
