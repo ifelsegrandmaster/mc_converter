@@ -23,6 +23,7 @@ Create an account at exchangerate-api.com. Copy the API key from your dashboard.
 
 If you change your key. You have to start the metro bundler using the command below.  
 `$ expo r -c` 
+
 The `-c` option means clear metro bundler cache.
 
 ## Run
