@@ -161,7 +161,7 @@ export default function Calculator() {
                         Add currency
                     </Button>
                     <DropDown
-                        label={"Select day"}
+                        label={"Select rates for day"}
                         mode={'outlined'}
                         value={date}
                         setValue={setNewDateValue}
