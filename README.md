@@ -21,6 +21,18 @@ Create an account at exchangerate-api.com. Copy the API key from your dashboard.
 
 `API_KEY=<your_api_key>`
 
-## Run
+If you change your key. You have to start the metro bundler using the command below.  
+`$ expo r -c` 
+`-c` option means clear metro bundler cache.
 
+## Run
+###  Android
 `$ yarn android `
+### Web 
+`$ yarn web `
+
+## Platforms supported
+- Android
+- Web
+
+
