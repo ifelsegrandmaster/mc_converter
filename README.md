@@ -16,6 +16,8 @@ For installation details goto https://docs.expo.io/workflow/expo-cli/
 
 ## Install dependencies
 
+`$ cd md_converter`
+
 `$ yarn install`
 
 ## Set API_KEY environmnent variable
