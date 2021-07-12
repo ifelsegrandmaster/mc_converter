@@ -16,7 +16,7 @@ For installation details goto https://docs.expo.io/workflow/expo-cli/
 
 ## Install dependencies
 
-`$ cd md_converter`
+`$ cd mc_converter`
 
 `$ yarn install`
 
