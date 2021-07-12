@@ -1,4 +1,4 @@
-# mc_converter
+# Multi-currency converter
 ## Prerequisites
 
 ### expo-cli
