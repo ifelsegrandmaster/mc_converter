@@ -216,7 +216,7 @@ export default function Calculator() {
                         },
                     }}
                 >
-                    Saving query
+                    Saved query
                 </Snackbar>
             </View>
         </ScrollView>
