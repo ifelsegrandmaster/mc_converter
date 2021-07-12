@@ -1,4 +1,9 @@
 # Multi-currency converter
+
+## Platforms supported
+- Android
+- Web
+
 ## Prerequisites
 
 ### expo-cli
@@ -32,8 +37,5 @@ The `-c` option means clear metro bundler cache.
 ### Web 
 `$ yarn web `
 
-## Platforms supported
-- Android
-- Web
 
 
