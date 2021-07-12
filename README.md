@@ -20,7 +20,7 @@ For installation details goto https://docs.expo.io/workflow/expo-cli/
 
 `$ yarn install`
 
-## Set API_KEY environmnent variable
+## Set API_KEY environment variable
 
 Create a .env file in the project's root directory and add `API_KEY` environment variable
 
