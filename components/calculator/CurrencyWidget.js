@@ -76,7 +76,8 @@ const styles = StyleSheet.create(
         removeCurrencyButton: {
             padding: 10,
             marginBottom: 5,
-            marginTop: 5
+            marginTop: 5,
+            zIndex: -99,
         },
         removeCurrencyButtonContainer: {
             flex: 2

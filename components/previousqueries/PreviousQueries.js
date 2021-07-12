@@ -24,7 +24,7 @@ export default function PreviousQueries({navigation}) {
     (
         <List.Item
             key={index}
-            title={`${query.amount} ${query.name} (${query.code})`}
+            title={`${query.amount.toFixed(2)} ${query.name} (${query.code})`}
             onPress={() => displayQuery(query)}
             description={query.timestamp}
             style={styles.listItem}

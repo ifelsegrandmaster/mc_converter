@@ -186,7 +186,8 @@ export const fetchCurrencies = async(dispatch) => {
         const response = await axios.get(url);
         currencies = response.data.supported_codes;
     } catch (error) {
-        const detail = "Could not load currencies from remote server.";
+        const detail = "Could not load currencies from remote server." +
+            " Aborting fetch currencies rates.";
         const message = error.message;
         dispatch(fetchCurrenciesFailure({ detail, message }));
         dispatch(loadCurrenciesFromCache);

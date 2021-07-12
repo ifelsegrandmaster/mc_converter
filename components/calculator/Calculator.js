@@ -4,7 +4,7 @@ import { fetchCurrencies, initHistory, setCurrenciesRates } from "../../appSlice
 import { saveQuery, initQueries } from "./calculatorSlice";
 
 import { StyleSheet, ScrollView, View } from "react-native";
-import { Button, Portal, Dialog, Snackbar, TextInput, Paragraph } from "react-native-paper";
+import { Button, Portal, Dialog, Snackbar, TextInput, Paragraph, Card, Title } from "react-native-paper";
 import CurrenciesList from "./CurrenciesList";
 import CurrencyWidget from "./CurrencyWidget";
 import DropDown from 'react-native-paper-dropdown';
@@ -18,13 +18,12 @@ export default function Calculator() {
     // To be used to display text if currencies data
     // is not loaded. A network, authentication or authorization error
     // might occur and data will not be available.
-
     const currenciesReady = useSelector((state) => state.app.currenciesReady);
     const loadingCurrencies = useSelector((state) => state.app.loadingCurrencies);
 
     let currenciesStatus = "";
     if (!loadingCurrencies && !currenciesReady) {
-        currenciesStatus = "Could not retrieve currencies. Check error logs.";
+        currenciesStatus = "Could not retrieve currencies. Please check error logs.";
     }
 
     const currenciesRatesReady = useSelector((state) => state.app.currenciesRatesReady);
@@ -32,7 +31,7 @@ export default function Calculator() {
 
     let currenciesRatesStatus = "";
     if (!loadingCurrenciesRates && !currenciesRatesReady) {
-        currenciesRatesStatus = "Could not retrieve currencies rates. Check error logs.";
+        currenciesRatesStatus = "Could not retrieve currencies rates. Please check error logs.";
     }
 
     const currenciesToBeConverted = useSelector((state) => state.calculator.currenciesToBeConverted);
@@ -43,14 +42,19 @@ export default function Calculator() {
 
     // Populate the dropdown with keys from history, which are date strings.
     const history = useSelector((state) => state.app.history);
-    const historyList = Object.keys(history).map(entry => {
-        const d = new Date(entry);
-        let label = d.toDateString();
+    const historyList = Object.keys(history).reverse().map(entry => {
+
+        const day = new Date(entry);
+
+        let label = day.toDateString();
         const now = new Date();
-        if (d.getDate() === now.getDate()) {
+
+        if (day.getDate() === now.getDate()) {
             label = "Today";
         }
+
         return { value: entry, label: label };
+
     });
     // Set dropdown state
     const [showDropDown, setShowDropDown] = useState(false);
@@ -144,57 +148,60 @@ export default function Calculator() {
     }, [null])
 
     return (
-        <View style={styles.container}>
-            <View style={styles.scrollView}>
-                <ScrollView>
-                    <View>
-                        <Button
-                            style={styles.addCurrencyButton}
-                            icon="plus"
-                            title="Add currency"
-                            mode="contained"
-                            onPress={showDialog}
-                        >
-                            Add currency
-                </Button>
-                        <DropDown
-                            label={"Select day"}
-                            mode={'outlined'}
-                            value={date}
-                            setValue={setNewDateValue}
-                            list={historyList}
-                            visible={showDropDown}
-                            showDropDown={() => setShowDropDown(true)}
-                            onDismiss={() => setShowDropDown(false)}
-                            inputProps={{
-                                right: <TextInput.Icon name={'menu-down'} />,
-                            }}
-                        />
-
-                    </View>
-                    <Portal>
-                        <Dialog visible={dialogIsVisible} onDismiss={hideDialog}>
-                            <Dialog.Title>Add currency</Dialog.Title>
-                            <Dialog.Content>
-                                <CurrenciesList closeDialog={hideDialog} currencies={currencies} />
-                            </Dialog.Content>
-                            <Dialog.Actions>
-                                <Button title="Close" onPress={hideDialog}>Close</Button>
-                            </Dialog.Actions>
-                        </Dialog>
-                    </Portal>
-                    {currencyWidgets}
+        <ScrollView style={styles.container}>
+            <Card>
+                <Card.Content>
                     <Button
-                        style={styles.saveQueryButton}
-                        disabled={!saveQueryButtonEnabled}
+                        style={styles.addCurrencyButton}
+                        icon="plus"
                         title="Add currency"
                         mode="contained"
-                        onPress={() => saveQueryHandler(query)}>
-                        Save query
-            </Button>
-                </ScrollView>
+                        onPress={showDialog}>
+                        Add currency
+                    </Button>
+                    <DropDown
+                        label={"Select day"}
+                        mode={'outlined'}
+                        value={date}
+                        setValue={setNewDateValue}
+                        list={historyList}
+                        visible={showDropDown}
+                        showDropDown={() => setShowDropDown(true)}
+                        onDismiss={() => setShowDropDown(false)}
+                        inputProps={{
+                            right: <TextInput.Icon name={'menu-down'} />,
+                        }}
+                    />
+                </Card.Content>
+            </Card>
+            <Portal>
+                <Dialog visible={dialogIsVisible} onDismiss={hideDialog}>
+                    <Dialog.Title>Add currency</Dialog.Title>
+                    <Dialog.Content>
+                        <CurrenciesList closeDialog={hideDialog} currencies={currencies} />
+                    </Dialog.Content>
+                    <Dialog.Actions>
+                        <Button title="Close" onPress={hideDialog}>Close</Button>
+                    </Dialog.Actions>
+                </Dialog>
+            </Portal>
+            <Card style={styles.currencyWidgets}>
+                <Card.Content>
+                    <Title>Convert: {mainCurrency ? `${mainCurrency.name}(${mainCurrency.code})` : ""}</Title>
+                    {currencyWidgets}
+                </Card.Content>
+            </Card>
+            <View>
+                <Button
+                    style={styles.saveQueryButton}
+                    disabled={!saveQueryButtonEnabled}
+                    title="Add currency"
+                    mode="contained"
+                    onPress={() => saveQueryHandler(query)}>
+                    Save query
+                </Button>
             </View>
-            <View style={styles.bottomBar}>
+            <View>
                 <Paragraph>{currenciesStatus}</Paragraph>
                 <Paragraph>{currenciesRatesStatus}</Paragraph>
                 <Snackbar
@@ -206,11 +213,12 @@ export default function Calculator() {
                             // Do something
                             setSnackBarVisible(false);
                         },
-                    }}>
+                    }}
+                >
                     Saving query
-            </Snackbar>
+                </Snackbar>
             </View>
-        </View>
+        </ScrollView>
     );
 }
 
@@ -221,21 +229,27 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: "column"
     },
-    scrollView: {
-        flex: 6,
-    },
-    bottomBar: {
-        flex: 1,
-    },
     addCurrencyButton: {
         padding: 10,
         marginBottom: 5,
         marginTop: 5,
-        flex: 1,
     },
     saveQueryButton: {
         padding: 10,
         marginBottom: 5,
         marginTop: 5
-    }
+    },
+    topComponents: {
+
+    },
+    middleComponents: {
+        flex: 4,
+        paddingBottom: 10,
+        borderWidth: 1,
+        borderColor: "#dddddd",
+    },
+    currencyWidgets: {
+        marginTop: 10,
+        marginBottom: 10,
+    },
 });
