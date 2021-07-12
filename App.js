@@ -15,7 +15,7 @@ import DisplayQueryData from "./components/previousqueries/DisplayQueryData";
 import NavigationBar from "./components/NavigationBar";
 import Logging from "./components/logging/Logging";
 
-import {AsyncStorage} from "react-native";
+
 const Stack = createStackNavigator();
 // Component
 export default function App() {

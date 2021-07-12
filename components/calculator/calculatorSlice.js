@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { AsyncStorage } from "react-native";
+import { Platform } from "react-native";
 import { historyOperationFailure } from "../../appSlice";
 
 
@@ -51,13 +52,19 @@ export const {
 // Initialize queries
 export const initQueries = async(dispatch) => {
     let queries = null;
-    try {
-        queries = await AsyncStorage.getItem('queries');
-    } catch (error) {
-        const detail = "Could not load queries from local storage";
-        const message = error.message;
-        dispatch(historyOperationFailure({ detail, message }));
-        return;
+    if (Platform.OS === 'android') {
+        try {
+            queries = await AsyncStorage.getItem('queries');
+        } catch (error) {
+            const detail = "Could not load queries from local storage";
+            const message = error.message;
+            dispatch(historyOperationFailure({ detail, message }));
+            return;
+        }
+    }
+
+    if (Platform.OS === 'web') {
+        queries = localStorage.getItem('queries');
     }
 
     if (queries !== null) {
@@ -68,25 +75,37 @@ export const initQueries = async(dispatch) => {
 export const saveQuery = query => async(dispatch) => {
     // get the previous queries
     let queries = null;
-    try {
-        queries = await AsyncStorage.getItem('queries');
-    } catch (error) {
-        const detail = "Could not get queries from local storage.";
-        const message = error.message;
-        dispatch(historyOperationFailure({ detail, message }));
-        return;
+    if (Platform.OS === 'android') {
+        try {
+            queries = await AsyncStorage.getItem('queries');
+        } catch (error) {
+            const detail = "Could not get queries from local storage.";
+            const message = error.message;
+            dispatch(historyOperationFailure({ detail, message }));
+            return;
+        }
+    }
+
+    if (Platform.OS === 'web') {
+        queries = localStorage.getItem('queries');
     }
 
     const newQueries = JSON.parse(queries) || [];
     newQueries.push(query);
 
     // save to storage
-    try {
-        await AsyncStorage.setItem('queries', JSON.stringify(newQueries));
-    } catch (error) {
-        const detail = "Could not save query to local storage.";
-        const message = error.message;
-        dispatch(historyOperationFailure({ detail, message }));
+    if (Platform.OS === 'android') {
+        try {
+            await AsyncStorage.setItem('queries', JSON.stringify(newQueries));
+        } catch (error) {
+            const detail = "Could not save query to local storage.";
+            const message = error.message;
+            dispatch(historyOperationFailure({ detail, message }));
+        }
+    }
+
+    if (Platform.OS === 'web') {
+        localStorage.setItem('queries', JSON.stringify(newQueries));
     }
 
     // update state

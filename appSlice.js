@@ -3,6 +3,8 @@ import axios from "axios";
 import getCurrenciesRates from "./utils";
 import { AsyncStorage } from "react-native";
 import { API_KEY } from "@env";
+import { Platform } from "react-native";
+
 
 export const appSlice = createSlice({
     name: 'app',
@@ -70,13 +72,19 @@ export const {
 
 export const initHistory = async(dispatch) => {
     let history = null;
-    try {
-        history = await AsyncStorage.getItem('history');
-    } catch (error) {
-        const detail = "Could not get history from local storage";
-        const message = error.message;
-        dispatch(historyOperationFailure({ detail, message }));
-        return;
+    if (Platform.OS === 'android') {
+        try {
+            history = await AsyncStorage.getItem('history');
+        } catch (error) {
+            const detail = "Could not get history from local storage";
+            const message = error.message;
+            dispatch(historyOperationFailure({ detail, message }));
+            return;
+        }
+    }
+
+    if (Platform.OS === 'web') {
+        history = localStorage.getItem('history');
     }
 
     if (history !== null) {
@@ -88,16 +96,24 @@ export const initHistory = async(dispatch) => {
 
 export const updateHistory = data => async(dispatch) => {
     let history = null;
-    console.log(data);
-    try {
-        history = await AsyncStorage.getItem('history');
-    } catch (error) {
-        const detail = "Could not get history from local storage";
-        const message = error.message;
-        console.log(message);
-        dispatch(historyOperationFailure({ detail, message }));
-        return;
+    // Android
+    if (Platform.OS === 'android') {
+        try {
+            history = await AsyncStorage.getItem('history');
+        } catch (error) {
+            const detail = "Could not get history from local storage";
+            const message = error.message;
+            console.log(message);
+            dispatch(historyOperationFailure({ detail, message }));
+            return;
+        }
     }
+
+    // Web
+    if (Platform.OS === 'web') {
+        history = localStorage.getItem('history');
+    }
+
 
     const now = new Date();
     const newKey = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`;
@@ -117,13 +133,19 @@ export const updateHistory = data => async(dispatch) => {
     }
 
     // save the history
-    try {
-        await AsyncStorage.setItem('history', JSON.stringify(newHistory));
-    } catch (error) {
-        const detail = "Could not save history to local storage.";
-        const message = error.message;
-        dispatch(historyOperationFailure({ detail, message }));
-        return;
+    if (Platform.OS === 'android') {
+        try {
+            await AsyncStorage.setItem('history', JSON.stringify(newHistory));
+        } catch (error) {
+            const detail = "Could not save history to local storage.";
+            const message = error.message;
+            dispatch(historyOperationFailure({ detail, message }));
+            return;
+        }
+    }
+
+    if (Platform.OS === 'web') {
+        localStorage.setItem('history', JSON.stringify(newHistory));
     }
     dispatch(setHistory(newHistory));
 }
@@ -151,25 +173,37 @@ export const fetchCurrenciesRates = (currencies) => async(dispatch) => {
 };
 
 export const saveCurrencies = (currencies) => async(dispatch) => {
-    try {
-        await AsyncStorage.setItem('currencies', JSON.stringify(currencies));
-    } catch (error) {
-        const detail = "Could not save currencies to local storage.";
-        const message = error.message;
-        dispatch(historyOperationFailure({ detail, message }));
+    if (Platform.OS === 'android') {
+        try {
+            await AsyncStorage.setItem('currencies', JSON.stringify(currencies));
+        } catch (error) {
+            const detail = "Could not save currencies to local storage.";
+            const message = error.message;
+            dispatch(historyOperationFailure({ detail, message }));
+        }
+    }
+
+    if (Platform.OS === 'web') {
+        localStorage.setItem('currencies', JSON.stringify(currencies));
     }
 }
 
 // Load currencies from cache, for example if network error occurs
 export const loadCurrenciesFromCache = async(dispatch) => {
         let currencies = null;
-        try {
-            currencies = await AsyncStorage.getItem('currencies');
-        } catch (error) {
-            const detail = "Could not load currencies from storage.";
-            const message = error.message;
-            dispatch(historyOperationFailure({ detail, message }));
-            return;
+        if (Platform.OS === 'android') {
+            try {
+                currencies = await AsyncStorage.getItem('currencies');
+            } catch (error) {
+                const detail = "Could not load currencies from storage.";
+                const message = error.message;
+                dispatch(historyOperationFailure({ detail, message }));
+                return;
+            }
+        }
+
+        if (Platform.OS === 'web') {
+            currencies = localStorage.getItem('currencies');
         }
 
         if (currencies !== null) {

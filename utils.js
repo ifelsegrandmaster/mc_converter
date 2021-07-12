@@ -1,6 +1,7 @@
 import axios from "axios";
 import { API_KEY } from "@env";
 
+
 // fetch currency data
 export async function fetchCurrencyData(code) {
     const url = `https://v6.exchangerate-api.com/v6/${API_KEY}/latest/${code}`;
