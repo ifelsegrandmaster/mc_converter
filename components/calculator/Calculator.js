@@ -74,14 +74,15 @@ export default function Calculator() {
 
     // show and hide Snackbar
     const [snackBarIsVisible, setSnackBarVisible] = useState(false);
-    const onToggleSnackBar = () => setSnackBarVisible(!snackBarIsVisible);
     const onDismissSnackBar = () => setSnackBarVisible(false);
 
     // store the currency code, currecy name, converted amount and the code
     /**
      * {
      *   code: 'USD'
-     *   timestamp: Date()
+     *   name: 'United states dollar'
+     *   amount: 123
+     *   timestamp: Date().toLocaleString()
      *   conversion_rates: [
      *       {
      *           code: 'AUD',
@@ -238,15 +239,6 @@ const styles = StyleSheet.create({
         padding: 10,
         marginBottom: 5,
         marginTop: 5
-    },
-    topComponents: {
-
-    },
-    middleComponents: {
-        flex: 4,
-        paddingBottom: 10,
-        borderWidth: 1,
-        borderColor: "#dddddd",
     },
     currencyWidgets: {
         marginTop: 10,
