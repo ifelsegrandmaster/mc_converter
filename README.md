@@ -3,6 +3,7 @@
 ## Platforms supported
 - Android
 - Web
+- iOS
 
 ## Prerequisites
 
